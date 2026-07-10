@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University Application Hub</title>
+
+    <!-- CSS file (you'll write next) -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- Optional: nicer system font baseline (still pure HTML/CSS) -->
+    <meta name="color-scheme" content="light dark" />
+</head>
+
+<body>
+    <!-- Background layer (blur/glow gradients/video/etc later in CSS) -->
+    <div class="app-bg" aria-hidden="true"></div>
+
+    <!-- LOADING SCREEN -->
+    <section id="screen-loading" class="screen screen--active" aria-label="Loading screen">
+        <div class="glass-panel glass-panel--center">
+            <h1 class="app-title">University Application Hub</h1>
+            <p class="muted">Loading your dashboard…</p>
+
+            <div class="progress" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100"
+                aria-valuenow="35">
+                <div class="progress__bar"></div>
+            </div>
+
+            <p class="tiny muted">Preparing your workspace</p>
+        </div>
+    </section>
+
+    <!-- ONBOARDING -->
+    <section id="screen-onboarding" class="screen" aria-label="Onboarding">
+        <div class="layout layout--center">
+            <header class="header header--minimal">
+                <div class="brand">
+                    <span class="brand__mark" aria-hidden="true">◆</span>
+                    <span class="brand__name">University Application Hub</span>
+                </div>
+
+                <button id="themeToggle" class="btn btn--glass" type="button" aria-pressed="false">
+                    <span class="btn__icon" aria-hidden="true">🌓</span>
+                    <span class="btn__text">Light / Night</span>
+                </button>
+            </header>
+
+            <main class="onboarding">
+                <article class="glass-card">
+                    <h2>Add your first university</h2>
+                    <p class="muted">Start small. You can add more schools anytime.</p>
+
+                    <form id="form-add-university" class="form">
+                        <div class="form-row">
+                            <label for="uniName">University name <span class="req">*</span></label>
+                            <input id="uniName" name="uniName" type="text" placeholder="e.g., Stanford University"
+                                required />
+                        </div>
+
+                        <div class="form-row">
+                            <label for="appRound">Application round</label>
+                            <select id="appRound" name="appRound">
+                                <option value="" selected>Choose one</option>
+                                <option value="ED">ED (Early Decision)</option>
+                                <option value="EA">EA (Early Action)</option>
+                                <option value="REA">REA (Restrictive EA)</option>
+                                <option value="RD">RD (Regular Decision)</option>
+                                <option value="Rolling">Rolling</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="deadline">Deadline</label>
+                            <input id="deadline" name="deadline" type="date" />
+                        </div>
+
+                        <fieldset class="fieldset">
+                            <legend>Optional links</legend>
+
+                            <div class="form-row">
+                                <label for="linkAdmissions">Admissions page</label>
+                                <input id="linkAdmissions" name="linkAdmissions" type="url" placeholder="https://…" />
+                            </div>
+
+                            <div class="form-row">
+                                <label for="linkNPC">Net price calculator</label>
+                                <input id="linkNPC" name="linkNPC" type="url" placeholder="https://…" />
+                            </div>
+
+                            <div class="form-row">
+                                <label for="linkPortal">Applicant portal</label>
+                                <input id="linkPortal" name="linkPortal" type="url" placeholder="https://…" />
+                            </div>
+                        </fieldset>
+
+                        <div class="actions">
+                            <button class="btn btn--primary" type="submit">Add University</button>
+                            <button id="btn-demo-data" class="btn btn--glass" type="button">Skip (use demo
+                                data)</button>
+                        </div>
+                    </form>
+                </article>
+            </main>
+        </div>
+    </section>
+
+    <!-- MAIN APP -->
+    <section id="screen-app" class="screen" aria-label="Main dashboard">
+        <div class="app-shell">
+            <!-- Top bar -->
+            <header class="topbar">
+                <div class="brand">
+                    <span class="brand__mark" aria-hidden="true">◆</span>
+                    <span class="brand__name">Application Hub</span>
+                </div>
+
+                <div class="topbar__controls">
+                    <div class="search">
+                        <label class="sr-only" for="globalSearch">Search</label>
+                        <input id="globalSearch" type="search" placeholder="Search schools, tasks, essays…" />
+                        <button id="btn-clear-search" class="icon-btn" type="button"
+                            aria-label="Clear search">✕</button>
+                    </div>
+
+                    <button id="themeToggle2" class="icon-btn" type="button" aria-label="Toggle light/night mode"
+                        aria-pressed="false">🌓</button>
+
+                    <button id="btn-export" class="btn btn--glass" type="button">Export</button>
+                    <label class="btn btn--glass" for="importFile">
+                        Import
+                        <input id="importFile" type="file" accept="application/json" hidden />
+                    </label>
+                </div>
+            </header>
+
+            <div class="app-body">
+                <!-- Sidebar / Tabs -->
+                <nav class="nav" aria-label="Primary navigation">
+                    <button class="nav__item nav__item--active" type="button" data-route="overview">
+                        <span class="nav__icon" aria-hidden="true">🏠</span>
+                        <span class="nav__label">Dashboard</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="universities">
+                        <span class="nav__icon" aria-hidden="true">🎓</span>
+                        <span class="nav__label">Universities</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="guided">
+                        <span class="nav__icon" aria-hidden="true">🧭</span>
+                        <span class="nav__label">Guided Research</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="tasks">
+                        <span class="nav__icon" aria-hidden="true">✅</span>
+                        <span class="nav__label">Tasks</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="essays">
+                        <span class="nav__icon" aria-hidden="true">📝</span>
+                        <span class="nav__label">Essays</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="tracking">
+                        <span class="nav__icon" aria-hidden="true">📌</span>
+                        <span class="nav__label">Tracking</span>
+                    </button>
+
+                    <button class="nav__item" type="button" data-route="storage">
+                        <span class="nav__icon" aria-hidden="true">💾</span>
+                        <span class="nav__label">Backup</span>
+                    </button>
+                </nav>
+
+                <!-- Main content -->
+                <main class="content" aria-live="polite">
+                    <!-- PAGE: DASHBOARD / OVERVIEW -->
+                    <section class="page page--active" data-page="overview" aria-label="Dashboard overview">
+                        <div class="grid grid--2">
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Next deadlines</h2>
+                                    <button class="btn btn--glass btn--small" type="button" id="btn-add-uni-quick">+
+                                        Add</button>
+                                </header>
+                                <ul id="list-next-deadlines" class="list list--cards">
+                                    <!-- JS injects items -->
+                                </ul>
+                            </article>
+
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>What should I do next?</h2>
+                                    <button class="btn btn--glass btn--small" type="button" id="btn-focus-next3">Focus:
+                                        next 3</button>
+                                </header>
+                                <ul id="list-next-actions" class="list list--cards">
+                                    <!-- JS injects items -->
+                                </ul>
+                            </article>
+                        </div>
+
+                        <div class="grid grid--3">
+                            <article class="glass-card">
+                                <h3>Schools</h3>
+                                <p class="metric"><span id="metric-schools">0</span></p>
+                                <p class="muted tiny">Total tracked</p>
+                            </article>
+
+                            <article class="glass-card">
+                                <h3>Tasks remaining</h3>
+                                <p class="metric"><span id="metric-tasks">0</span></p>
+                                <p class="muted tiny">Across all schools</p>
+                            </article>
+
+                            <article class="glass-card">
+                                <h3>Essays in progress</h3>
+                                <p class="metric"><span id="metric-essays">0</span></p>
+                                <p class="muted tiny">Draft / revised</p>
+                            </article>
+                        </div>
+
+                        <article class="glass-card">
+                            <header class="card-head">
+                                <h2>Focus mode</h2>
+                            </header>
+                            <div class="focus">
+                                <p class="muted">Work on only 1 school today. Everything else stays quiet.</p>
+                                <div class="actions">
+                                    <select id="focusSchoolSelect" aria-label="Select a school for focus mode">
+                                        <option value="" selected>Pick a school…</option>
+                                    </select>
+                                    <button id="btn-start-focus" class="btn btn--primary" type="button">Start
+                                        focus</button>
+                                    <button id="btn-end-focus" class="btn btn--glass" type="button">End focus</button>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <!-- PAGE: UNIVERSITIES -->
+                    <section class="page" data-page="universities" aria-label="Universities">
+                        <div class="page-head">
+                            <h1>Universities</h1>
+
+                            <div class="page-controls">
+                                <button id="btn-add-university" class="btn btn--primary" type="button">+ Add
+                                    University</button>
+
+                                <div class="filters">
+                                    <label class="sr-only" for="filterStatus">Status filter</label>
+                                    <select id="filterStatus">
+                                        <option value="" selected>All statuses</option>
+                                        <option value="Researching">Researching</option>
+                                        <option value="Drafting">Drafting</option>
+                                        <option value="Submitted">Submitted</option>
+                                    </select>
+
+                                    <label class="sr-only" for="sortUniversities">Sort</label>
+                                    <select id="sortUniversities">
+                                        <option value="soonest" selected>Soonest deadline</option>
+                                        <option value="priority">Priority</option>
+                                        <option value="alpha">Alphabetical</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <section class="cards-grid" id="universitiesGrid" aria-label="University cards">
+                            <!-- JS renders university glass cards here -->
+                        </section>
+
+                        <!-- School Profile panel (shown when a school is selected) -->
+                        <section class="panel" id="schoolProfilePanel" aria-label="School profile" hidden>
+                            <header class="panel__head">
+                                <div>
+                                    <h2 id="schoolProfileName">School Name</h2>
+                                    <p class="muted tiny" id="schoolProfileMeta">ED • Deadline: —</p>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn btn--glass" type="button" id="btn-close-profile">Close</button>
+                                </div>
+                            </header>
+
+                            <div class="tabs" role="tablist" aria-label="School sections">
+                                <button class="tab tab--active" type="button" role="tab"
+                                    data-subtab="admissions">Admissions</button>
+                                <button class="tab" type="button" role="tab" data-subtab="academics">Academics</button>
+                                <button class="tab" type="button" role="tab" data-subtab="courses">Courses</button>
+                                <button class="tab" type="button" role="tab" data-subtab="research">Research</button>
+                                <button class="tab" type="button" role="tab" data-subtab="clubs">Clubs</button>
+                                <button class="tab" type="button" role="tab" data-subtab="location">Location</button>
+                                <button class="tab" type="button" role="tab" data-subtab="cost">Cost & Aid</button>
+                                <button class="tab" type="button" role="tab" data-subtab="outcomes">Outcomes</button>
+                            </div>
+
+                            <div class="panel__body">
+                                <!-- Subtab content shells (JS will fill forms/fields) -->
+                                <section class="subpage subpage--active" data-subpage="admissions">
+                                    <div class="grid grid--2">
+                                        <article class="glass-card">
+                                            <h3>Admissions notes</h3>
+                                            <textarea id="admissionsNotes"
+                                                placeholder="Testing policy, interview policy, required materials…"></textarea>
+                                        </article>
+                                        <article class="glass-card">
+                                            <h3>Links</h3>
+                                            <div class="form">
+                                                <div class="form-row">
+                                                    <label for="profilePortal">Portal link</label>
+                                                    <input id="profilePortal" type="url" placeholder="https://…" />
+                                                </div>
+                                                <div class="form-row">
+                                                    <label for="profileFee">Application fee / waiver</label>
+                                                    <input id="profileFee" type="text" placeholder="$ / waiver notes" />
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </section>
+
+                                <section class="subpage" data-subpage="academics">
+                                    <article class="glass-card">
+                                        <h3>Academics</h3>
+                                        <textarea id="academicsNotes"
+                                            placeholder="Majors you care about, departments, degree requirements, catalog highlights…"></textarea>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="courses">
+                                    <article class="glass-card">
+                                        <header class="card-head">
+                                            <h3>Courses</h3>
+                                            <button class="btn btn--glass btn--small" type="button"
+                                                id="btn-add-course">+ Add</button>
+                                        </header>
+                                        <div id="coursesList" class="stack"></div>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="research">
+                                    <article class="glass-card">
+                                        <header class="card-head">
+                                            <h3>Research</h3>
+                                            <button class="btn btn--glass btn--small" type="button"
+                                                id="btn-add-research">+ Add</button>
+                                        </header>
+                                        <div id="researchList" class="stack"></div>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="clubs">
+                                    <article class="glass-card">
+                                        <header class="card-head">
+                                            <h3>Clubs & student life</h3>
+                                            <button class="btn btn--glass btn--small" type="button" id="btn-add-club">+
+                                                Add</button>
+                                        </header>
+                                        <div id="clubsList" class="stack"></div>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="location">
+                                    <article class="glass-card">
+                                        <h3>Location & campus</h3>
+                                        <textarea id="locationNotes"
+                                            placeholder="City/state, weather/vibe, travel notes, transportation links…"></textarea>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="cost">
+                                    <article class="glass-card">
+                                        <h3>Cost & aid</h3>
+                                        <textarea id="costNotes"
+                                            placeholder="NPC link, scholarships, aid policies, dealbreakers…"></textarea>
+                                    </article>
+                                </section>
+
+                                <section class="subpage" data-subpage="outcomes">
+                                    <article class="glass-card">
+                                        <h3>Outcomes / careers</h3>
+                                        <textarea id="outcomesNotes"
+                                            placeholder="Internships notes, alumni outcomes link, career center notes…"></textarea>
+                                    </article>
+                                </section>
+                            </div>
+                        </section>
+                    </section>
+
+                    <!-- PAGE: GUIDED RESEARCH -->
+                    <section class="page" data-page="guided" aria-label="Guided research">
+                        <div class="page-head">
+                            <h1>Guided Research</h1>
+                            <p class="muted">Tap a box to see what to look for, suggested search queries, and a place to
+                                save links + notes.</p>
+                        </div>
+
+                        <div class="grid grid--3" id="guidedResearchGrid">
+                            <!-- Example cards; JS can generate these from a template list -->
+                            <article class="glass-card research-card" data-research="major-reqs">
+                                <h3>Find your major requirements</h3>
+                                <p class="muted tiny">Degree map, required courses, concentration rules.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="two-courses">
+                                <h3>Find 2 courses you would take</h3>
+                                <p class="muted tiny">Course catalog + “why I care.”</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="one-club">
+                                <h3>Find 1 club you'd join</h3>
+                                <p class="muted tiny">Student org directory, vibe notes.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="lab-prof">
+                                <h3>Find 1 professor/lab</h3>
+                                <p class="muted tiny">Labs, centers, faculty pages.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="npc">
+                                <h3>Find net price calculator</h3>
+                                <p class="muted tiny">Save link + cost notes.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="support">
+                                <h3>Find support services</h3>
+                                <p class="muted tiny">Tutoring, disability services, advising.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+
+                            <article class="glass-card research-card" data-research="outcomes">
+                                <h3>Find outcomes page</h3>
+                                <p class="muted tiny">Internships, first-destination reports.</p>
+                                <button class="btn btn--glass btn--small" type="button">Open</button>
+                            </article>
+                        </div>
+
+                        <article class="glass-card">
+                            <header class="card-head">
+                                <h2>Time budget paths</h2>
+                            </header>
+                            <div class="grid grid--3">
+                                <div class="mini-card">
+                                    <h3>10 minutes</h3>
+                                    <ul class="checklist" id="path-10">
+                                        <!-- JS fills -->
+                                    </ul>
+                                </div>
+                                <div class="mini-card">
+                                    <h3>30 minutes</h3>
+                                    <ul class="checklist" id="path-30"></ul>
+                                </div>
+                                <div class="mini-card">
+                                    <h3>60 minutes</h3>
+                                    <ul class="checklist" id="path-60"></ul>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <!-- PAGE: TASKS -->
+                    <section class="page" data-page="tasks" aria-label="Tasks">
+                        <div class="page-head">
+                            <h1>Tasks</h1>
+                            <p class="muted">Per-school lists + a global urgency queue.</p>
+                        </div>
+
+                        <div class="grid grid--2">
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Global task queue</h2>
+                                    <button class="btn btn--glass btn--small" type="button" id="btn-add-task-global">+
+                                        Add</button>
+                                </header>
+                                <ul id="globalTaskList" class="list list--cards"></ul>
+                            </article>
+
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Per-school tasks</h2>
+                                    <div class="actions">
+                                        <select id="tasksSchoolSelect" aria-label="Select school">
+                                            <option value="" selected>Pick a school…</option>
+                                        </select>
+                                        <button class="btn btn--glass btn--small" type="button"
+                                            id="btn-add-task-school">+ Add</button>
+                                    </div>
+                                </header>
+                                <ul id="schoolTaskList" class="list list--cards"></ul>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- PAGE: ESSAYS -->
+                    <section class="page" data-page="essays" aria-label="Essays">
+                        <div class="page-head">
+                            <h1>Essays</h1>
+                            <p class="muted">Unlimited supplementals + a vanilla rich-text editor.</p>
+                        </div>
+
+                        <div class="grid grid--2">
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Essay list</h2>
+                                    <div class="actions">
+                                        <select id="essaysSchoolSelect" aria-label="Select school">
+                                            <option value="" selected>Pick a school…</option>
+                                        </select>
+                                        <button class="btn btn--glass btn--small" type="button" id="btn-add-essay">+
+                                            Add</button>
+                                    </div>
+                                </header>
+                                <ul id="essayList" class="list list--cards"></ul>
+                            </article>
+
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Editor</h2>
+                                    <div class="editor-meta">
+                                        <span class="tiny muted" id="editorStatus">Not started</span>
+                                        <span class="tiny muted" id="wordCount">0 words</span>
+                                        <span class="tiny muted" id="charCount">0 chars</span>
+                                    </div>
+                                </header>
+
+                                <!-- Rich text toolbar (vanilla execCommand or custom) -->
+                                <div class="toolbar" role="toolbar" aria-label="Editor toolbar">
+                                    <button class="icon-btn" type="button" data-cmd="bold"
+                                        aria-label="Bold"><b>B</b></button>
+                                    <button class="icon-btn" type="button" data-cmd="italic"
+                                        aria-label="Italic"><i>I</i></button>
+                                    <button class="icon-btn" type="button" data-cmd="underline"
+                                        aria-label="Underline"><u>U</u></button>
+                                    <span class="toolbar__divider" aria-hidden="true"></span>
+                                    <button class="icon-btn" type="button" data-cmd="insertUnorderedList"
+                                        aria-label="Bullets">• List</button>
+                                    <button class="icon-btn" type="button" data-cmd="insertOrderedList"
+                                        aria-label="Numbered list">1. List</button>
+                                    <span class="toolbar__divider" aria-hidden="true"></span>
+                                    <button class="icon-btn" type="button" data-cmd="formatBlock" data-value="h2"
+                                        aria-label="Heading">H</button>
+                                </div>
+
+                                <div class="editor">
+                                    <label class="sr-only" for="essayPrompt">Prompt</label>
+                                    <textarea id="essayPrompt" class="editor__prompt"
+                                        placeholder="Paste the prompt here…"></textarea>
+
+                                    <div id="richEditor" class="editor__body" contenteditable="true" role="textbox"
+                                        aria-multiline="true" aria-label="Essay editor">
+                                        <!-- user types here -->
+                                    </div>
+
+                                    <div class="editor-foot">
+                                        <div class="limit">
+                                            <label class="sr-only" for="wordLimit">Word limit</label>
+                                            <input id="wordLimit" type="number" min="0"
+                                                placeholder="Word limit (optional)" />
+                                            <span class="tiny muted" id="limitWarning"></span>
+                                        </div>
+
+                                        <div class="actions">
+                                            <button id="btn-save-snapshot" class="btn btn--glass btn--small"
+                                                type="button">Save snapshot</button>
+                                            <button id="btn-save-essay" class="btn btn--primary btn--small"
+                                                type="button">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="grid grid--2">
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Story vault / idea bank</h2>
+                                    <button id="btn-add-story" class="btn btn--glass btn--small" type="button">+
+                                        Add</button>
+                                </header>
+                                <div id="storyVault" class="stack"></div>
+                            </article>
+
+                            <article class="glass-card">
+                                <header class="card-head">
+                                    <h2>Reusable blocks</h2>
+                                    <button id="btn-add-block" class="btn btn--glass btn--small" type="button">+
+                                        Add</button>
+                                </header>
+                                <div id="reusableBlocks" class="stack"></div>
+                            </article>
+                        </div>
+                    </section>
+
+                    <!-- PAGE: TRACKING -->
+                    <section class="page" data-page="tracking" aria-label="Application tracking">
+                        <div class="page-head">
+                            <h1>Application Tracking</h1>
+                            <p class="muted">Move schools through stages with a clean status pipeline.</p>
+                        </div>
+
+                        <article class="glass-card">
+                            <header class="card-head">
+                                <h2>Status pipeline</h2>
+                                <div class="actions">
+                                    <select id="trackingSchoolSelect" aria-label="Select school">
+                                        <option value="" selected>Pick a school…</option>
+                                    </select>
+                                </div>
+                            </header>
+
+                            <div class="pipeline" aria-label="Pipeline stages">
+                                <button class="chip" type="button" data-stage="Researching">Researching</button>
+                                <button class="chip" type="button" data-stage="In progress">In progress</button>
+                                <button class="chip" type="button" data-stage="Essays drafted">Essays drafted</button>
+                                <button class="chip" type="button" data-stage="Ready to submit">Ready to submit</button>
+                                <button class="chip" type="button" data-stage="Submitted">Submitted</button>
+                                <button class="chip" type="button" data-stage="Waiting decision">Waiting
+                                    decision</button>
+                                <button class="chip" type="button" data-stage="Accepted">Accepted</button>
+                                <button class="chip" type="button" data-stage="Waitlisted">Waitlisted</button>
+                                <button class="chip" type="button" data-stage="Rejected">Rejected</button>
+                            </div>
+
+                            <div class="grid grid--2">
+                                <div class="glass-subcard">
+                                    <h3>Submission checklist</h3>
+                                    <ul id="submissionChecklist" class="checklist"></ul>
+                                    <button id="btn-add-checkitem" class="btn btn--glass btn--small" type="button">+ Add
+                                        item</button>
+                                </div>
+
+                                <div class="glass-subcard">
+                                    <h3>Portal & notes</h3>
+                                    <div class="form">
+                                        <div class="form-row">
+                                            <label for="trackingPortal">Portal link</label>
+                                            <input id="trackingPortal" type="url" placeholder="https://…" />
+                                        </div>
+                                        <div class="form-row">
+                                            <label for="trackingCreds">Credentials notes (prototype only)</label>
+                                            <textarea id="trackingCreds"
+                                                placeholder="Don’t store real passwords. Use hints only."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <!-- PAGE: STORAGE / BACKUP -->
+                    <section class="page" data-page="storage" aria-label="Storage and backup">
+                        <div class="page-head">
+                            <h1>Backup & Storage</h1>
+                            <p class="muted">Export/import JSON and manage local data safely.</p>
+                        </div>
+
+                        <div class="grid grid--2">
+                            <article class="glass-card">
+                                <h2>Backup</h2>
+                                <p class="muted">Save your data to a JSON file you can restore later.</p>
+                                <div class="actions">
+                                    <button id="btn-export2" class="btn btn--primary" type="button">Export to
+                                        JSON</button>
+                                    <label class="btn btn--glass" for="importFile2">
+                                        Import JSON
+                                        <input id="importFile2" type="file" accept="application/json" hidden />
+                                    </label>
+                                </div>
+                            </article>
+
+                            <article class="glass-card">
+                                <h2>Reset</h2>
+                                <p class="muted">Clears localStorage for this app on this device.</p>
+                                <button id="btn-reset" class="btn btn--danger" type="button">Reset all data</button>
+                            </article>
+                        </div>
+
+                        <article class="glass-card">
+                            <h2>Auto-snapshot (optional)</h2>
+                            <div class="actions">
+                                <label class="switch">
+                                    <input id="toggle-autosnapshot" type="checkbox" />
+                                    <span class="switch__ui" aria-hidden="true"></span>
+                                    <span class="switch__label">Daily auto-snapshot</span>
+                                </label>
+                            </div>
+                            <p class="tiny muted">If enabled, the app saves a daily backup copy in localStorage.</p>
+                        </article>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODALS -->
+    <dialog id="modal" class="modal">
+        <form method="dialog" class="modal__panel glass-card">
+            <header class="modal__head">
+                <h2 id="modalTitle">Modal</h2>
+                <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
+            </header>
+
+            <div id="modalBody" class="modal__body">
+                <!-- JS injects content -->
+            </div>
+
+            <footer class="modal__foot actions">
+                <button class="btn btn--glass" value="cancel">Cancel</button>
+                <button id="modalConfirm" class="btn btn--primary" value="default">Save</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Toasts -->
+    <div id="toasts" class="toasts" aria-live="polite" aria-label="Notifications"></div>
+
+    <!-- JS file (you'll write after CSS) -->
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* ==========================================================
+   Design tokens — glass / aurora theme
+   Light mode is the default; dark mode overrides via [data-theme="dark"]
+   ========================================================== */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --color-accent: #3b82f6;
+  --color-accent-2: #8b5cf6;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  --radius-glass-lg: 22px;
+  --radius-glass-md: 16px;
+  --radius-glass-sm: 12px;
+
+  --ease-glass: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root {
+  color-scheme: light;
+
+  --bg-0: #f4f7ff;
+  --bg-1: #eef3ff;
+  --bg-2: #fff7f0;
+
+  --text: rgba(10, 14, 24, 0.92);
+  --muted: rgba(10, 14, 24, 0.62);
+  --tiny: rgba(10, 14, 24, 0.55);
+
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-2: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-inner: rgba(255, 255, 255, 0.35);
+
+  --shadow: 0 10px 30px rgba(0, 10, 50, 0.12);
+  --shadow-strong: 0 18px 46px rgba(0, 10, 50, 0.18);
+  --glow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 30px rgba(80, 120, 255, 0.25);
+
+  --field-bg: rgba(255, 255, 255, 0.6);
+  --field-border: rgba(255, 255, 255, 0.6);
+  --field-focus: rgba(59, 130, 246, 0.45);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-0: #060913;
+  --bg-1: #0b1230;
+  --bg-2: #0b0f22;
+
+  --text: rgba(245, 247, 255, 0.92);
+  --muted: rgba(245, 247, 255, 0.62);
+  --tiny: rgba(245, 247, 255, 0.55);
+
+  --glass-bg: rgba(18, 26, 48, 0.55);
+  --glass-bg-2: rgba(18, 26, 48, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-inner: rgba(255, 255, 255, 0.08);
+
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-strong: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --glow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 34px rgba(120, 140, 255, 0.24);
+
+  --field-bg: rgba(18, 26, 48, 0.55);
+  --field-border: rgba(255, 255, 255, 0.14);
+  --field-focus: rgba(139, 92, 246, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ambient animated background */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(1200px 800px at 15% 10%, rgba(59, 130, 246, 0.22), transparent 60%),
+    radial-gradient(900px 700px at 85% 20%, rgba(139, 92, 246, 0.18), transparent 55%),
+    radial-gradient(1100px 900px at 45% 95%, rgba(255, 146, 86, 0.14), transparent 55%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+  filter: saturate(1.15);
+}
+
+[data-theme="dark"] .app-bg {
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.app-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Glass surface primitive, composed with Tailwind utilities via @apply-like usage in components */
+.glass-surface {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
+    var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+.glass-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 var(--glass-inner);
+  opacity: 0.95;
+}
+
+.glass-surface::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(800px 280px at 20% -10%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(700px 260px at 90% 0%, rgba(255, 255, 255, 0.2), transparent 55%);
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface {
+    background: color-mix(in srgb, var(--glass-bg) 88%, white);
+  }
+}
+
+/* Skeleton loading shimmer */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--glass-inner) 90%, white) 50%,
+    transparent
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Custom scrollbar, kept subtle */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--glass-border) 80%, transparent);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
