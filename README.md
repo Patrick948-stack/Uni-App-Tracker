@@ -110,6 +110,24 @@ legacy-vanilla/   the original plain HTML/CSS/JS version, kept for comparison
 - **Single-device only.** Data lives in one browser's `localStorage`. Export/import is the only way to move it, or to back it up before clearing browser data.
 - Tested in Chrome on desktop during development. Not yet checked on a real mobile device or with a screen reader (the ARIA attributes are there, but "wrote the attribute" and "verified it works" are different claims and I'm only making the first one right now).
 
+## From vanilla JavaScript to React+TypeScript
+
+The original version lived in the `legacy-vanilla/` folder: plain HTML, CSS, and ~2000 lines of imperative JavaScript. It worked, but had friction points:
+
+- **State chaos**: form values scattered across the DOM, no single source of truth. Updating a school's name in one place didn't sync it everywhere it appeared.
+- **Type safety: zero**: typos in object keys, wrong array indices, data shape mismatches only surfaced at runtime (or didn't, as bugs).
+- **Testing: manual only**: changes to core logic meant opening the app and manually clicking through flows to verify nothing broke.
+- **Code organization**: everything was methods on one big object, or callbacks nested three levels deep.
+
+**The rebuild** (v2.0) keeps the exact same feature set, data model, and UX, but rebuilt with:
+
+- React for component boundaries (each feature is a self-contained component, not scattered logic)
+- TypeScript for compile-time verification (mismatched data shapes caught before run time)
+- Zustand for state (single source of truth, no more DOM-scraping)
+- Playwright for automated tests (core flows are verified on every commit)
+
+**Result**: same thing, fewer bugs, easier to add features without fear of breaking the whole app. The vanilla version is still there as a reference if you want to see the before state (or run it locally).
+
 ## What building this taught me
 
 - How much a type system catches before you run the code. TypeScript flagged real bugs while I was migrating the data model from the old vanilla-JS version, every time correctly.
