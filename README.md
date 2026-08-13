@@ -1,8 +1,8 @@
 # University Application Hub
 
-A React + TypeScript dashboard for tracking college applications: deadlines, tasks, essays, research notes, and decision status per school. Built for managing the entire application lifecycle from research through acceptance, with zero server overhead or login friction.
+A React + TypeScript dashboard for tracking college applications: deadlines, tasks, essays, research notes, and decision status per school. Built while applying for transfer to a new college, born out of the chaos and overwhelm of managing multiple schools at once.
 
-**Why this exists:** The college application process spans 6-12 months across 5-20 schools, each with its own deadlines, essay requirements, financial aid timelines, and decision pipelines. Spreadsheets get unwieldy fast. This app keeps everything in one place, sorted by urgency, with guided research checklists and essay drafting built in.
+**Why this exists:** I started the transfer application process without a real plan. Researching schools felt bottomless: where do you even start when looking at a college's website? Essays were scattered across folders and drafts, hard to compare versions or track what I'd actually sent. Deadlines were spread across calendars and sticky notes. By school three or four, I was drowning: too many tabs open, too many decisions to track, no way to see progress or know which school to focus on next. So I built this tool to fix it: one place for everything (research, essays, deadlines, decisions), with guided checklists so the research process doesn't feel like guessing, and a dashboard that shows what matters right now instead of the overwhelming 5-20-school view all at once.
 
 ## Quick start
 
