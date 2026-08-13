@@ -139,14 +139,19 @@ The original version lived in the `legacy-vanilla/` folder: plain HTML, CSS, and
 
 ### Planned features (in priority order)
 
-- **Live demo**: deploy to CDN so you can try it without cloning
-- **Multi-device sync**: keep your data in sync across phone, laptop, and tablet via optional cloud backup (no mandatory account)
+- **Live demo**: deploy to CDN so you can try it without cloning and decide if it fits before setting up
+- **Shared review mode**: invite a teacher, parent, or peer reviewer to see your essays and leave comments without giving them edit access
+- **Recommendation letter tracker**: log which professors you asked for letters, track when they said yes/no, see submission deadlines, get reminders so you're not hounding anyone
+- **Financial aid comparison**: side-by-side view of scholarship amounts and net cost per school (with links to each school's net price calculator). See actual affordability at a glance instead of sticker shock
+- **Interview prep timeline**: schedule interviews per school, add notes on the interviewer, generate interview questions for that school based on your research, track which schools you've interviewed for
+- **Essay prompt library**: common prompts (Why Us, Overcoming Adversity, Community, etc) with starter templates and tips so you're not staring at a blank page
+- **Multi-device sync**: keep your data in sync across phone, laptop, and tablet via optional cloud backup (no mandatory account, no login required)
+- **Calendar integration**: iCal feed so all deadlines (essay due, interview, decision release) appear in your calendar app without manual duplication
+- **PDF essay archive**: snapshot essays at submission time so you can see exactly what you sent, regardless of later edits
+- **Email reminders**: get a message 1 week and 1 day before each deadline so nothing sneaks up on you
 - **Spreadsheet export**: download your schools/tasks/timeline as CSV for spreadsheet apps or sharing with parents/counselors
-- **Calendar integration**: iCal feed so all deadlines appear in your calendar app without manual entry
-- **PDF essay archival**: snapshot essays at submission time so you can see exactly what you sent, regardless of later edits
-- **Progress analytics**: completion rates per school, essay drafting velocity, task burndown, to see progress at a glance
-- **Shared view mode**: generate a read-only link to share your application tracker with a parent, counselor, or peer reviewer without giving edit access
-- **Mobile app**: React Native version for a native iOS/Android experience (same codebase, native navigation)
+- **Progress dashboard**: burndown chart, essay drafting velocity, completion rates per school so you can actually see progress instead of feeling stuck
+- **Mobile app**: React Native version for a native iOS/Android experience (same data, native navigation)
 
 ## Deployment
 
