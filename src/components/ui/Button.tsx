@@ -28,16 +28,18 @@ const sizeClasses: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "glass", size = "md", children, ...props }, ref) => {
+  ({ className, variant = "glass", size = "md", disabled, children, ...props }, ref) => {
     return (
       <motion.button
         ref={ref}
         type="button"
-        whileHover={{ y: -1 }}
-        whileTap={{ y: 0, scale: 0.98 }}
+        disabled={disabled}
+        whileHover={disabled ? undefined : { y: -1 }}
+        whileTap={disabled ? undefined : { y: 0, scale: 0.98 }}
         transition={{ duration: 0.15 }}
         className={cn(
           "inline-flex items-center justify-center gap-2 font-semibold tracking-[-0.01em] cursor-pointer transition-shadow",
+          "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:saturate-50",
           variantClasses[variant],
           sizeClasses[size],
           className,

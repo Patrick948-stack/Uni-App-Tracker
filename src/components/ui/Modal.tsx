@@ -13,17 +13,49 @@ interface ModalProps {
   footer?: ReactNode;
 }
 
+const FOCUSABLE_SELECTOR =
+  'input, textarea, select, button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+
 export function Modal({ open, onClose, title, children, footer }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    triggerRef.current = document.activeElement as HTMLElement | null;
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      // Keep keyboard focus inside the dialog while it's open — without
+      // this, Tab escapes into the (visually hidden, but still in the DOM)
+      // page behind the backdrop.
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKey);
-    panelRef.current?.querySelector<HTMLElement>("input, textarea, select, button")?.focus();
-    return () => document.removeEventListener("keydown", onKey);
+    panelRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      // Return focus to whatever opened the dialog, so keyboard users land
+      // back where they were instead of at the top of the document.
+      triggerRef.current?.focus?.();
+    };
   }, [open, onClose]);
 
   return createPortal(
@@ -31,9 +63,9 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
       {open && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, pointerEvents: "none" }}
+          animate={{ opacity: 1, pointerEvents: "auto" }}
+          exit={{ opacity: 0, pointerEvents: "none" }}
           transition={{ duration: 0.18 }}
         >
           <motion.div

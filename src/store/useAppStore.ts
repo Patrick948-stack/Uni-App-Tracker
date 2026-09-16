@@ -8,12 +8,15 @@ import type {
   CheckItem,
   Essay,
   EssaySnapshot,
+  GuidedResearchNote,
   PipelineStage,
   ReusableBlock,
   StorySnippet,
   Task,
   University,
 } from "@/types";
+
+const EMPTY_RESEARCH_NOTE: GuidedResearchNote = { link: "", notes: "", done: false };
 
 const STORAGE_KEY = "uah:v2";
 
@@ -70,6 +73,8 @@ interface AppActions {
   addCheckItem: (universityId: string, label: string) => void;
   toggleCheckItem: (universityId: string, itemId: string) => void;
   removeCheckItem: (universityId: string, itemId: string) => void;
+
+  updateGuidedResearchNote: (universityId: string, key: string, patch: Partial<GuidedResearchNote>) => void;
 
   setFocusSchool: (id: string | null) => void;
 
@@ -182,6 +187,21 @@ export const useAppStore = create<AppStore>()(
               ? {
                   ...u,
                   submissionChecklist: u.submissionChecklist.filter((c) => c.id !== itemId),
+                }
+              : u,
+          ),
+        })),
+
+      updateGuidedResearchNote: (universityId, key, patch) =>
+        set((s) => ({
+          universities: s.universities.map((u) =>
+            u.id === universityId
+              ? {
+                  ...u,
+                  guidedResearch: {
+                    ...u.guidedResearch,
+                    [key]: { ...EMPTY_RESEARCH_NOTE, ...u.guidedResearch?.[key], ...patch },
+                  },
                 }
               : u,
           ),

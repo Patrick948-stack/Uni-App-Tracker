@@ -32,6 +32,12 @@ export interface CheckItem {
   done: boolean;
 }
 
+export interface GuidedResearchNote {
+  link: string;
+  notes: string;
+  done: boolean;
+}
+
 export interface University {
   id: string;
   name: string;
@@ -62,6 +68,7 @@ export interface University {
   submissionChecklist: CheckItem[];
   trackingPortal: string;
   trackingCreds: string;
+  guidedResearch?: Record<string, GuidedResearchNote>;
   createdAt: string;
 }
 

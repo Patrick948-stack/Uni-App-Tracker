@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useSearchStore } from "@/store/useSearchStore";
 import { toast } from "@/store/useToastStore";
 import { daysUntil } from "@/lib/dates";
 import { priorityScore } from "@/lib/priority";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Field";
 import { TaskListItem } from "@/components/tasks/TaskListItem";
 import { TaskModal } from "@/components/tasks/TaskModal";
@@ -14,23 +16,31 @@ export function TasksPage() {
   const tasks = useAppStore((s) => s.tasks);
   const universities = useAppStore((s) => s.universities);
   const toggleTaskDone = useAppStore((s) => s.toggleTaskDone);
+  const removeTask = useAppStore((s) => s.removeTask);
+  const query = useSearchStore((s) => s.query).trim().toLowerCase();
 
   const [schoolId, setSchoolId] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [modalDefaultSchool, setModalDefaultSchool] = useState<string | undefined>(undefined);
+  const [deleteTarget, setDeleteTarget] = useState<Task | undefined>(undefined);
 
   const globalQueue = useMemo(
     () =>
-      [...tasks].sort((a, b) => {
-        const da = a.dueDate ? (daysUntil(a.dueDate) ?? 99999) : 99999;
-        const db = b.dueDate ? (daysUntil(b.dueDate) ?? 99999) : 99999;
-        return da - db || priorityScore(b.priority) - priorityScore(a.priority);
-      }),
-    [tasks],
+      tasks
+        .filter((t) => t.title.toLowerCase().includes(query))
+        .sort((a, b) => {
+          const da = a.dueDate ? (daysUntil(a.dueDate) ?? 99999) : 99999;
+          const db = b.dueDate ? (daysUntil(b.dueDate) ?? 99999) : 99999;
+          return da - db || priorityScore(b.priority) - priorityScore(a.priority);
+        }),
+    [tasks, query],
   );
 
-  const schoolTasks = useMemo(() => tasks.filter((t) => t.universityId === schoolId), [tasks, schoolId]);
+  const schoolTasks = useMemo(
+    () => (schoolId ? tasks.filter((t) => t.universityId === schoolId && t.title.toLowerCase().includes(query)) : []),
+    [tasks, schoolId, query],
+  );
 
   function getUniversity(id: string) {
     return universities.find((u) => u.id === id);
@@ -55,7 +65,7 @@ export function TasksPage() {
         <p className="text-[var(--muted)]">Per-school lists + a global urgency queue.</p>
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-2">
+      <div className="grid gap-3.5 @xl:grid-cols-2">
         <GlassCard>
           <header className="flex items-center justify-between gap-3">
             <h2 className="text-[1.05rem] font-bold">Global task queue</h2>
@@ -64,7 +74,9 @@ export function TasksPage() {
             </Button>
           </header>
           <ul className="mt-3 grid list-none gap-2.5 p-0">
-            {globalQueue.length === 0 && <li className="text-[var(--muted)]">No tasks yet.</li>}
+            {globalQueue.length === 0 && (
+              <li className="text-[var(--muted)]">{query ? "No tasks match your search." : "No tasks yet."}</li>
+            )}
             {globalQueue.map((t) => (
               <TaskListItem
                 key={t.id}
@@ -72,6 +84,7 @@ export function TasksPage() {
                 university={t.universityId ? getUniversity(t.universityId) : undefined}
                 onToggle={() => toggleTaskDone(t.id)}
                 onEdit={() => openEdit(t)}
+                onDelete={() => setDeleteTarget(t)}
               />
             ))}
           </ul>
@@ -105,7 +118,11 @@ export function TasksPage() {
           </header>
           <ul className="mt-3 grid list-none gap-2.5 p-0">
             {!schoolId && <li className="text-[var(--muted)]">Pick a school to view tasks.</li>}
-            {schoolId && schoolTasks.length === 0 && <li className="text-[var(--muted)]">No tasks for this school yet.</li>}
+            {schoolId && schoolTasks.length === 0 && (
+              <li className="text-[var(--muted)]">
+                {query ? "No tasks match your search." : "No tasks for this school yet."}
+              </li>
+            )}
             {schoolTasks.map((t) => (
               <TaskListItem
                 key={t.id}
@@ -113,6 +130,7 @@ export function TasksPage() {
                 university={getUniversity(schoolId)}
                 onToggle={() => toggleTaskDone(t.id)}
                 onEdit={() => openEdit(t)}
+                onDelete={() => setDeleteTarget(t)}
               />
             ))}
           </ul>
@@ -125,6 +143,32 @@ export function TasksPage() {
         task={editingTask}
         defaultUniversityId={modalDefaultSchool}
       />
+
+      <Modal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(undefined)}
+        title="Delete this task?"
+        footer={
+          <>
+            <Button onClick={() => setDeleteTarget(undefined)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                if (!deleteTarget) return;
+                removeTask(deleteTarget.id);
+                setDeleteTarget(undefined);
+                toast("Task deleted.", "success");
+              }}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[var(--muted)]">
+          {deleteTarget ? `"${deleteTarget.title}" will be removed permanently.` : ""}
+        </p>
+      </Modal>
     </div>
   );
 }

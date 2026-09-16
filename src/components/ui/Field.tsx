@@ -1,5 +1,6 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
+import { isValidUrl } from "@/lib/url";
 
 const fieldClasses =
   "w-full text-[var(--text)] bg-[var(--field-bg)] border border-[var(--field-border)] rounded-[14px] px-3 py-2.5 outline-none shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition-[border-color,box-shadow] duration-200 focus:border-[color-mix(in_srgb,var(--field-focus)_65%,white)] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--field-focus)_35%,transparent)]";
@@ -18,7 +19,7 @@ export function FormRow({
   return (
     <div className="grid gap-2">
       <label htmlFor={htmlFor} className="text-[0.92rem] font-semibold text-[var(--muted)]">
-        {label} {required && <span className="text-[var(--color-danger)] font-bold">*</span>}
+        {label} {required && <span className="text-[var(--color-danger-text)] font-bold">*</span>}
       </label>
       {children}
     </div>
@@ -27,6 +28,26 @@ export function FormRow({
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(fieldClasses, className)} {...props} />;
+}
+
+export function UrlField({
+  className,
+  value,
+  ...props
+}: Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value"> & { value: string }) {
+  const invalid = !isValidUrl(value);
+  return (
+    <div className="grid gap-1">
+      <Input
+        type="url"
+        value={value}
+        aria-invalid={invalid}
+        className={cn(invalid && "border-[var(--color-danger)] focus:border-[var(--color-danger)]", className)}
+        {...props}
+      />
+      {invalid && <p className="text-[0.78rem] text-[var(--color-danger-text)]">Doesn't look like a valid link.</p>}
+    </div>
+  );
 }
 
 export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {

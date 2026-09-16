@@ -1,10 +1,11 @@
-import { Bold, Check, Heading2, Italic, List, ListOrdered, Loader2, Underline } from "lucide-react";
+import { Bold, Check, Heading2, Italic, List, ListOrdered, Loader2, Trash2, Underline } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
 import { toast } from "@/store/useToastStore";
 import { uid } from "@/lib/id";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Input, Textarea } from "@/components/ui/Field";
 import type { Essay } from "@/types";
 
@@ -24,9 +25,11 @@ function countWords(text: string): number {
   return t ? t.split(/\s+/).filter(Boolean).length : 0;
 }
 
-export function EssayEditor({ essay }: { essay: Essay | undefined }) {
+export function EssayEditor({ essay, onDelete }: { essay: Essay | undefined; onDelete?: () => void }) {
   const updateEssay = useAppStore((s) => s.updateEssay);
+  const removeEssay = useAppStore((s) => s.removeEssay);
   const addSnapshot = useAppStore((s) => s.addSnapshot);
+  const snapshots = useAppStore((s) => s.snapshots);
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [prompt, setPrompt] = useState(essay?.prompt ?? "");
@@ -34,6 +37,7 @@ export function EssayEditor({ essay }: { essay: Essay | undefined }) {
   const [wordCount, setWordCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Load the essay's saved content whenever the selected essay changes.
   useEffect(() => {
@@ -101,6 +105,14 @@ export function EssayEditor({ essay }: { essay: Essay | undefined }) {
     toast("Snapshot saved.", "success");
   }
 
+  function restoreSnapshot(bodyHtml: string) {
+    if (!essay) return;
+    if (editorRef.current) editorRef.current.innerHTML = bodyHtml;
+    updateCounts();
+    updateEssay(essay.id, { bodyHtml, lastEdited: new Date().toISOString() });
+    toast("Snapshot restored.", "success");
+  }
+
   function runCommand(cmd: string, value?: string) {
     editorRef.current?.focus();
     document.execCommand(cmd, false, value);
@@ -116,12 +128,23 @@ export function EssayEditor({ essay }: { essay: Essay | undefined }) {
   const limit = parseInt(wordLimit || "0", 10) || 0;
   const limitDiff = limit ? limit - wordCount : null;
 
+  const essaySnapshots = essay
+    ? snapshots.filter((s) => s.essayId === essay.id).slice().reverse()
+    : [];
+
   return (
     <div className="grid gap-2.5">
-      <div className="flex flex-wrap items-center gap-2.5 text-[0.85rem] text-[var(--tiny)]">
-        <span>{essay?.status ?? "Not started"}</span>
-        <span>{wordCount} words</span>
-        <span>{charCount} chars</span>
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5 text-[0.85rem] text-[var(--tiny)]">
+          <span>{essay?.status ?? "Not started"}</span>
+          <span>{wordCount} words</span>
+          <span>{charCount} chars</span>
+        </div>
+        {essay && (
+          <Button size="icon" variant="ghost" aria-label="Delete essay" onClick={() => setConfirmDeleteOpen(true)}>
+            <Trash2 size={16} />
+          </Button>
+        )}
       </div>
 
       <div
@@ -234,7 +257,53 @@ export function EssayEditor({ essay }: { essay: Essay | undefined }) {
             </Button>
           </div>
         </div>
+
+        {essay && essaySnapshots.length > 0 && (
+          <div className="grid gap-2">
+            <p className="text-[0.85rem] font-semibold text-[var(--muted)]">Snapshots</p>
+            <ul className="grid list-none gap-2 p-0">
+              {essaySnapshots.map((snap) => (
+                <li
+                  key={snap.id}
+                  className="flex items-center justify-between gap-2.5 rounded-2xl border border-[color-mix(in_srgb,var(--glass-border)_70%,transparent)] bg-[color-mix(in_srgb,var(--glass-bg-2)_70%,transparent)] px-3 py-2"
+                >
+                  <span className="text-[0.85rem]">{snap.title}</span>
+                  <Button size="sm" onClick={() => restoreSnapshot(snap.bodyHtml)}>
+                    Restore
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
+
+      <Modal
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        title="Delete this essay?"
+        footer={
+          <>
+            <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                if (!essay) return;
+                removeEssay(essay.id);
+                setConfirmDeleteOpen(false);
+                toast("Essay deleted.", "success");
+                onDelete?.();
+              }}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[var(--muted)]">
+          {essay ? `"${essay.title}" and its content will be removed permanently.` : ""}
+        </p>
+      </Modal>
     </div>
   );
 }

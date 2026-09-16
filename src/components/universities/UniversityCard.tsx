@@ -23,7 +23,9 @@ export function UniversityCard({
     <GlassCard>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="truncate text-[1.02rem] font-black tracking-tight">{university.name}</div>
+          <div className="truncate text-[1.02rem] font-black tracking-tight" title={university.name}>
+            {university.name}
+          </div>
           <div className="text-[0.85rem] text-[var(--tiny)]">
             {university.round || "—"} •{" "}
             {university.deadline

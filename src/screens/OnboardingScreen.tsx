@@ -6,7 +6,8 @@ import { makeUniversity } from "@/lib/factories";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { FormRow, Input, Select } from "@/components/ui/Field";
+import { FormRow, Input, Select, UrlField } from "@/components/ui/Field";
+import { isValidUrl } from "@/lib/url";
 import { ROUND_OPTIONS } from "@/types";
 import type { ApplicationRound } from "@/types";
 
@@ -25,6 +26,10 @@ export function OnboardingScreen() {
     e.preventDefault();
     if (!name.trim()) {
       toast("University name is required.");
+      return;
+    }
+    if (!isValidUrl(admissions) || !isValidUrl(npc) || !isValidUrl(portal)) {
+      toast("Fix the invalid link(s) before saving.");
       return;
     }
     addUniversity(
@@ -88,27 +93,24 @@ export function OnboardingScreen() {
                 <legend className="px-2 font-bold text-[var(--muted)]">Optional links</legend>
                 <div className="grid gap-3">
                   <FormRow label="Admissions page" htmlFor="linkAdmissions">
-                    <Input
+                    <UrlField
                       id="linkAdmissions"
-                      type="url"
                       placeholder="https://…"
                       value={admissions}
                       onChange={(e) => setAdmissions(e.target.value)}
                     />
                   </FormRow>
                   <FormRow label="Net price calculator" htmlFor="linkNPC">
-                    <Input
+                    <UrlField
                       id="linkNPC"
-                      type="url"
                       placeholder="https://…"
                       value={npc}
                       onChange={(e) => setNpc(e.target.value)}
                     />
                   </FormRow>
                   <FormRow label="Applicant portal" htmlFor="linkPortal">
-                    <Input
+                    <UrlField
                       id="linkPortal"
-                      type="url"
                       placeholder="https://…"
                       value={portal}
                       onChange={(e) => setPortal(e.target.value)}

@@ -23,14 +23,15 @@ Open the URL Vite prints (`http://localhost:5173`). Click **Skip (use demo data)
 
 ## What it does
 
-- **Dashboard**: next deadlines and next tasks sorted by urgency, a pipeline-breakdown chart, and a "focus mode" that hides every school except the one you pick.
-- **Universities**: per-school profile with tabs for admissions notes, academics, courses, research/labs, clubs, location, cost & aid, outcomes.
-- **Guided Research**: checklists for what to actually look up on a school's site (major requirements, two courses, a club, a professor, the net price calculator), plus 10/30/60-minute versions for when you've only got a few minutes.
-- **Tasks**: a global queue across all schools, plus per-school views, with due dates and priority.
-- **Essays**: unlimited supplementals per school, a rich-text editor with word/char counts and a word-limit warning, manual snapshots, and a story-vault / reusable-blocks section.
+- **Dashboard**: next deadlines and next tasks sorted by urgency (click either to jump straight to that school's profile), a pipeline-breakdown chart, and a "focus mode" that actually hides every other school from the dashboard and the Universities list until you turn it off.
+- **Universities**: per-school profile with tabs for admissions notes, academics, courses, research/labs, clubs, location, cost & aid, outcomes, plus admissions/net-price/portal links. Delete a school (with a confirmation step) if you decide not to apply after all — it takes its tasks and essays with it.
+- **Guided Research**: a per-school checklist for what to actually look up on a school's site (major requirements, two courses, a club, a professor, the net price calculator). Each item expands into suggested search queries plus a place to save a link and notes, tracked separately for every school. Plus 10/30/60-minute time-budget versions for when you've only got a few minutes.
+- **Tasks**: a global queue across all schools, plus per-school views, with due dates, priority, and delete (with confirmation). The search bar in the top nav filters both lists live.
+- **Essays**: unlimited supplementals per school, a rich-text editor with word/char counts and a word-limit warning, manual snapshots you can browse and restore, a story-vault / reusable-blocks section, and delete (with confirmation). The search bar in the top nav filters the essay list live.
 - **Tracking**: a status pipeline (Researching → Submitted → Accepted/Waitlisted/Rejected/...) and a submission checklist per school.
-- **Backup**: export the whole thing to JSON, import it back later. Data lives in `localStorage` only.
+- **Backup**: export the whole thing to JSON, import it back later (validated against a schema before it's applied — a malformed file is rejected with a toast, not silently merged). Data lives in `localStorage` only.
 - **⌘K / Ctrl K command menu**: jump to any page or school, toggle theme, export, without touching the mouse. `?` shows the full shortcut list.
+- **Responsive nav**: below tablet width, the sidebar becomes a fixed bottom tab bar (Dashboard / Universities / Tasks / Essays, plus a "More" sheet for Guided Research / Tracking / Backup) so the app is usable one-handed on a phone.
 
 ![Dashboard, light mode](./docs/screenshots/dashboard-light.png)
 ![A school's profile panel, dark mode](./docs/screenshots/school-profile-dark.png)
@@ -103,12 +104,12 @@ legacy-vanilla/   the original plain HTML/CSS/JS version, kept for comparison
 - **No live demo deployed yet.** Run it locally for now.
 - **Automated browser tests are now in place.** Playwright covers smoke, core flows, essays, the command palette, and unhappy-path validation.
 - **Route-level code splitting is now wired in.** Heavy page modules and the command palette are loaded lazily so the first paint stays lighter.
-- **Import isn't strictly validated.** Importing a JSON backup checks that it's an object and merges it into the default shape; it doesn't verify every field's type. A hand-edited or corrupted file could produce odd (not crashy) results.
+- **Import is validated against a schema.** A JSON backup is checked field-by-field (types, enums, shape) with Zod before it's applied; a malformed or hand-edited file is rejected with a toast instead of silently corrupting your data.
 - **The app now has a root error boundary.** A render error in a screen degrades to a recoverable fallback rather than crashing the whole app.
 - **CI runs Playwright on push and pull requests.** The workflow installs dependencies, browsers, and executes the browser suite automatically.
 - **Rich-text editor is intentionally basic** (bold/italic/underline/lists/headings via `execCommand`, no images or tables). A real editor library (TipTap, Lexical) is the upgrade path if that's ever needed.
 - **Single-device only.** Data lives in one browser's `localStorage`. Export/import is the only way to move it, or to back it up before clearing browser data.
-- Tested in Chrome on desktop during development. Not yet checked on a real mobile device or with a screen reader (the ARIA attributes are there, but "wrote the attribute" and "verified it works" are different claims and I'm only making the first one right now).
+- **Responsive down to phone widths**, with a dedicated bottom tab bar below the tablet breakpoint. Tested via browser device emulation, not yet on a real physical device. A screen-reader pass is still outstanding — the ARIA attributes are there, but "wrote the attribute" and "verified it works" are different claims and I'm only making the first one right now.
 
 ## From vanilla JavaScript to React+TypeScript
 

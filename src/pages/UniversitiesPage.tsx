@@ -20,9 +20,12 @@ export function UniversitiesPage() {
 
   const [statusFilter, setStatusFilter] = useState<UniversityStatus | "">("");
   const [sort, setSort] = useState<SortKey>("soonest");
+  const [showAllDespiteFocus, setShowAllDespiteFocus] = useState(false);
   const selectedId = useUIStore((s) => s.selectedUniversityId);
   const setSelectedId = useUIStore((s) => s.setSelectedUniversityId);
   const setAddUniversityOpen = useUIStore((s) => s.setAddUniversityOpen);
+  const focusSchoolId = useAppStore((s) => s.meta.focusSchoolId);
+  const focusedSchoolName = universities.find((u) => u.id === focusSchoolId)?.name;
 
   const list = useMemo(() => {
     let items = [...universities];
@@ -39,6 +42,8 @@ export function UniversitiesPage() {
 
     if (statusFilter) items = items.filter((u) => u.status === statusFilter);
 
+    if (focusSchoolId && !showAllDespiteFocus) items = items.filter((u) => u.id === focusSchoolId);
+
     if (sort === "alpha") items.sort((a, b) => a.name.localeCompare(b.name));
     if (sort === "soonest") {
       items.sort((a, b) => {
@@ -50,7 +55,7 @@ export function UniversitiesPage() {
     if (sort === "priority") items.sort((a, b) => priorityScore(b.priority) - priorityScore(a.priority));
 
     return items;
-  }, [universities, query, statusFilter, sort]);
+  }, [universities, query, statusFilter, sort, focusSchoolId, showAllDespiteFocus]);
 
   const selected = selectedId ? universities.find((u) => u.id === selectedId) : undefined;
 
@@ -91,6 +96,17 @@ export function UniversitiesPage() {
         </div>
       </div>
 
+      {focusSchoolId && (
+        <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[color-mix(in_srgb,var(--color-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--color-accent)_10%,transparent)] px-3.5 py-2.5">
+          <p className="text-[0.9rem]">
+            Focus mode: showing only <strong>{focusedSchoolName}</strong>.
+          </p>
+          <Button size="sm" onClick={() => setShowAllDespiteFocus((v) => !v)}>
+            {showAllDespiteFocus ? "Hide other schools" : "Show all schools"}
+          </Button>
+        </div>
+      )}
+
       {list.length === 0 ? (
         <EmptyState
           title={query ? "No results" : "No universities here yet"}
@@ -104,7 +120,7 @@ export function UniversitiesPage() {
           }
         />
       ) : (
-        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3.5 @lg:grid-cols-2 @4xl:grid-cols-3">
           {list.map((u) => (
             <UniversityCard key={u.id} university={u} tasks={tasks} onOpen={() => setSelectedId(u.id)} />
           ))}

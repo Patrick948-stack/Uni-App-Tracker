@@ -4,7 +4,8 @@ import { toast } from "@/store/useToastStore";
 import { makeUniversity } from "@/lib/factories";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { FormRow, Input, Select } from "@/components/ui/Field";
+import { FormRow, Input, Select, UrlField } from "@/components/ui/Field";
+import { isValidUrl } from "@/lib/url";
 import { ROUND_OPTIONS, STATUS_OPTIONS } from "@/types";
 import type { ApplicationRound, UniversityStatus } from "@/types";
 
@@ -32,6 +33,10 @@ export function AddUniversityModal({ open, onClose }: { open: boolean; onClose: 
   function handleSubmit() {
     if (!name.trim()) {
       toast("University name is required.");
+      return;
+    }
+    if (!isValidUrl(admissions) || !isValidUrl(npc) || !isValidUrl(portal)) {
+      toast("Fix the invalid link(s) before saving.");
       return;
     }
     const uni = makeUniversity({
@@ -91,13 +96,13 @@ export function AddUniversityModal({ open, onClose }: { open: boolean; onClose: 
         </FormRow>
 
         <FormRow label="Admissions link" htmlFor="m_adm">
-          <Input id="m_adm" type="url" placeholder="https://…" value={admissions} onChange={(e) => setAdmissions(e.target.value)} />
+          <UrlField id="m_adm" placeholder="https://…" value={admissions} onChange={(e) => setAdmissions(e.target.value)} />
         </FormRow>
         <FormRow label="Net price calculator" htmlFor="m_npc">
-          <Input id="m_npc" type="url" placeholder="https://…" value={npc} onChange={(e) => setNpc(e.target.value)} />
+          <UrlField id="m_npc" placeholder="https://…" value={npc} onChange={(e) => setNpc(e.target.value)} />
         </FormRow>
         <FormRow label="Portal link" htmlFor="m_portal">
-          <Input id="m_portal" type="url" placeholder="https://…" value={portal} onChange={(e) => setPortal(e.target.value)} />
+          <UrlField id="m_portal" placeholder="https://…" value={portal} onChange={(e) => setPortal(e.target.value)} />
         </FormRow>
       </div>
     </Modal>

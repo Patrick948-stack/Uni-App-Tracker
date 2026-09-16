@@ -1,5 +1,6 @@
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import {
   BookMarked,
   Compass,
@@ -28,6 +29,34 @@ export function CommandPalette() {
   const theme = useAppStore((s) => s.meta.theme);
   const toggleTheme = useAppStore((s) => s.toggleTheme);
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+
+  // Reset the search query every time the palette opens. Without this, a
+  // reopen that races the previous close's exit animation can reuse the
+  // still-mounted cmdk instance and inherit stale text from last time.
+  useEffect(() => {
+    if (open) setSearch("");
+  }, [open]);
+
+  // Radix's Dialog (used internally by Command.Dialog) locks the body with
+  // `pointer-events: none` and hides sibling landmarks via aria-hidden while
+  // open, then undoes both on close. Wrapping the dialog's own mount in our
+  // AnimatePresence-gated `{open && ...}` sometimes tears the dialog down
+  // before Radix's own cleanup effect runs, leaving the whole app
+  // unclickable. Force both back once our exit animation has finished.
+  // Scoped to landmark tags only — the app's own aria-hidden usage is only
+  // ever on small decorative icons (span/div), never on header/main/nav —
+  // so this can't accidentally undo an intentional one.
+  useEffect(() => {
+    if (open) return;
+    const t = setTimeout(() => {
+      document.body.style.pointerEvents = "";
+      document
+        .querySelectorAll('header[aria-hidden="true"], main[aria-hidden="true"], nav[aria-hidden="true"]')
+        .forEach((el) => el.removeAttribute("aria-hidden"));
+    }, 200);
+    return () => clearTimeout(t);
+  }, [open]);
 
   function run(fn: () => void) {
     fn();
@@ -42,15 +71,15 @@ export function CommandPalette() {
           onOpenChange={setOpen}
           label="Command menu"
           shouldFilter
-          className="fixed inset-0 z-[70] flex items-start justify-center p-4 pt-[12vh]"
+          className="pointer-events-none fixed inset-0 z-[70] flex items-start justify-center p-4 pt-[12vh]"
         >
           <motion.div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setOpen(false)}
             aria-hidden="true"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, pointerEvents: "none" }}
+            animate={{ opacity: 1, pointerEvents: "auto" }}
+            exit={{ opacity: 0, pointerEvents: "none" }}
             transition={{ duration: 0.15 }}
           />
           <motion.div
@@ -58,9 +87,11 @@ export function CommandPalette() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
-            className="glass-surface relative z-10 w-full max-w-[560px] overflow-hidden rounded-[var(--radius-glass-lg)]"
+            className="glass-surface pointer-events-auto relative z-10 w-full max-w-[560px] overflow-hidden rounded-[var(--radius-glass-lg)]"
           >
             <Command.Input
+              value={search}
+              onValueChange={setSearch}
               placeholder="Type a command or search…"
               className="w-full border-b border-[color-mix(in_srgb,var(--glass-border)_70%,transparent)] bg-transparent px-4 py-3.5 text-[0.95rem] outline-none placeholder:text-[var(--tiny)]"
             />

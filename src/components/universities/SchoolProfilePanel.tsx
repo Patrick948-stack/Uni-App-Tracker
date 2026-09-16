@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+import { Trash2 } from "lucide-react";
 import { useAppStore } from "@/store/useAppStore";
+import { toast } from "@/store/useToastStore";
 import { formatDate } from "@/lib/dates";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
-import { Input, Textarea } from "@/components/ui/Field";
+import { Modal } from "@/components/ui/Modal";
+import { Input, Textarea, UrlField } from "@/components/ui/Field";
 import { useAutosaveField } from "@/hooks/useAutosaveField";
 import { EntryListEditor } from "./EntryListEditor";
 import type { University } from "@/types";
@@ -51,8 +54,16 @@ function NotesTab({
 
 export function SchoolProfilePanel({ university, onClose }: { university: University; onClose: () => void }) {
   const updateUniversity = useAppStore((s) => s.updateUniversity);
+  const removeUniversity = useAppStore((s) => s.removeUniversity);
   const [tab, setTab] = useState<TabKey>("admissions");
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  const [admissions, setAdmissions] = useAutosaveField(university.links.admissions, (v) =>
+    updateUniversity(university.id, { links: { ...university.links, admissions: v } }),
+  );
+  const [npc, setNpc] = useAutosaveField(university.links.npc, (v) =>
+    updateUniversity(university.id, { links: { ...university.links, npc: v } }),
+  );
   const [portal, setPortal] = useAutosaveField(university.links.portal, (v) =>
     updateUniversity(university.id, { links: { ...university.links, portal: v } }),
   );
@@ -65,7 +76,7 @@ export function SchoolProfilePanel({ university, onClose }: { university: Univer
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="mt-3.5"
+      className="mt-3.5 min-w-0"
       aria-label="School profile"
     >
       <header className="mb-3 flex items-center justify-between gap-3">
@@ -75,7 +86,17 @@ export function SchoolProfilePanel({ university, onClose }: { university: Univer
             {university.round || "—"} • Deadline: {formatDate(university.deadline)}
           </p>
         </div>
-        <Button onClick={onClose}>Close</Button>
+        <div className="flex shrink-0 gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Delete ${university.name}`}
+            onClick={() => setConfirmDeleteOpen(true)}
+          >
+            <Trash2 size={17} />
+          </Button>
+          <Button onClick={onClose}>Close</Button>
+        </div>
       </header>
 
       <div className="mb-2.5 flex gap-2 overflow-x-auto pb-1.5" role="tablist" aria-label="School sections">
@@ -87,7 +108,7 @@ export function SchoolProfilePanel({ university, onClose }: { university: Univer
       </div>
 
       {tab === "admissions" && (
-        <div className="grid gap-3.5 md:grid-cols-2">
+        <div className="grid gap-3.5 @xl:grid-cols-2">
           <NotesTab
             university={university}
             field="admissions"
@@ -97,12 +118,33 @@ export function SchoolProfilePanel({ university, onClose }: { university: Univer
             <h3 className="mb-3 font-bold">Links</h3>
             <div className="grid gap-3">
               <div className="grid gap-2">
+                <label htmlFor="profileAdmissions" className="text-[0.92rem] font-semibold text-[var(--muted)]">
+                  Admissions page
+                </label>
+                <UrlField
+                  id="profileAdmissions"
+                  placeholder="https://…"
+                  value={admissions}
+                  onChange={(e) => setAdmissions(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="profileNpc" className="text-[0.92rem] font-semibold text-[var(--muted)]">
+                  Net price calculator
+                </label>
+                <UrlField
+                  id="profileNpc"
+                  placeholder="https://…"
+                  value={npc}
+                  onChange={(e) => setNpc(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
                 <label htmlFor="profilePortal" className="text-[0.92rem] font-semibold text-[var(--muted)]">
                   Portal link
                 </label>
-                <Input
+                <UrlField
                   id="profilePortal"
-                  type="url"
                   placeholder="https://…"
                   value={portal}
                   onChange={(e) => setPortal(e.target.value)}
@@ -216,6 +258,32 @@ export function SchoolProfilePanel({ university, onClose }: { university: Univer
           placeholder="Internships notes, alumni outcomes link, career center notes…"
         />
       )}
+
+      <Modal
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        title={`Delete ${university.name}?`}
+        footer={
+          <>
+            <Button onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                removeUniversity(university.id);
+                setConfirmDeleteOpen(false);
+                onClose();
+                toast(`${university.name} deleted.`, "success");
+              }}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[var(--muted)]">
+          This permanently removes {university.name} along with its tasks and essays. This can't be undone.
+        </p>
+      </Modal>
     </motion.section>
   );
 }

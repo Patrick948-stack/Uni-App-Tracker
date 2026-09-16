@@ -20,7 +20,7 @@ export function StoragePage() {
         <p className="text-[var(--muted)]">Export/import JSON and manage local data safely.</p>
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-2">
+      <div className="grid gap-3.5 @xl:grid-cols-2">
         <GlassCard>
           <h2 className="text-[1.05rem] font-bold">Backup</h2>
           <p className="mt-1 text-[var(--muted)]">Save your data to a JSON file you can restore later.</p>

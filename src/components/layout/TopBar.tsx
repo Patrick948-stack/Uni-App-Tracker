@@ -69,12 +69,16 @@ export function TopBar() {
 
         <ThemeToggle compact />
 
-        <Button onClick={exportJSON} title="Export your data as JSON">
+        <Button onClick={exportJSON} aria-label="Export your data as JSON" title="Export your data as JSON">
           <Download size={16} />
           <span className="hidden sm:inline">Export</span>
         </Button>
 
-        <Button onClick={() => fileInputRef.current?.click()} title="Import a JSON backup">
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          aria-label="Import a JSON backup"
+          title="Import a JSON backup"
+        >
           <Upload size={16} />
           <span className="hidden sm:inline">Import</span>
         </Button>

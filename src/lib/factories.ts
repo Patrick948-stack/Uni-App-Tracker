@@ -36,6 +36,7 @@ export function makeUniversity(
     submissionChecklist: [],
     trackingPortal: "",
     trackingCreds: "",
+    guidedResearch: {},
     createdAt: new Date().toISOString(),
   };
 }

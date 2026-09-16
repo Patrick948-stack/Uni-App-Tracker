@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { useSearchStore } from "@/store/useSearchStore";
 import { formatDate } from "@/lib/dates";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -19,11 +20,15 @@ export function EssaysPage() {
   const addReusableBlock = useAppStore((s) => s.addReusableBlock);
   const removeReusableBlock = useAppStore((s) => s.removeReusableBlock);
 
+  const query = useSearchStore((s) => s.query).trim().toLowerCase();
   const [schoolId, setSchoolId] = useState("");
   const [activeEssayId, setActiveEssayId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
 
-  const schoolEssays = useMemo(() => essays.filter((e) => e.universityId === schoolId), [essays, schoolId]);
+  const schoolEssays = useMemo(
+    () => essays.filter((e) => e.universityId === schoolId && e.title.toLowerCase().includes(query)),
+    [essays, schoolId, query],
+  );
   const activeEssay = activeEssayId ? essays.find((e) => e.id === activeEssayId) : undefined;
 
   return (
@@ -33,7 +38,7 @@ export function EssaysPage() {
         <p className="text-[var(--muted)]">Unlimited supplementals + a lightweight rich-text editor.</p>
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-2">
+      <div className="grid gap-3.5 @xl:grid-cols-2">
         <GlassCard>
           <header className="flex items-center justify-between gap-3">
             <h2 className="text-[1.05rem] font-bold">Essay list</h2>
@@ -62,7 +67,11 @@ export function EssaysPage() {
 
           <ul className="mt-3 grid list-none gap-2.5 p-0">
             {!schoolId && <li className="text-[var(--muted)]">Pick a school to see essays.</li>}
-            {schoolId && schoolEssays.length === 0 && <li className="text-[var(--muted)]">No essays yet. Add one.</li>}
+            {schoolId && schoolEssays.length === 0 && (
+              <li className="text-[var(--muted)]">
+                {query ? "No essays match your search." : "No essays yet. Add one."}
+              </li>
+            )}
             {schoolEssays.map((e) => (
               <li key={e.id}>
                 <button
@@ -92,12 +101,12 @@ export function EssaysPage() {
             <h2 className="text-[1.05rem] font-bold">Editor</h2>
           </header>
           <div className="mt-3">
-            <EssayEditor essay={activeEssay} />
+            <EssayEditor essay={activeEssay} onDelete={() => setActiveEssayId(null)} />
           </div>
         </GlassCard>
       </div>
 
-      <div className="grid gap-3.5 md:grid-cols-2">
+      <div className="grid gap-3.5 @xl:grid-cols-2">
         <GlassCard>
           <header>
             <h2 className="text-[1.05rem] font-bold">Story vault / idea bank</h2>

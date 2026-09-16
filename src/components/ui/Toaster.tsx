@@ -31,8 +31,8 @@ export function Toaster() {
               transition={{ duration: 0.2 }}
               className={cn(
                 "glass-surface flex items-center gap-2.5 rounded-[16px] px-3.5 py-3 text-sm font-medium max-w-[320px]",
-                t.type === "error" && "text-[var(--color-danger)]",
-                t.type === "success" && "text-[var(--color-success)]",
+                t.type === "error" && "text-[var(--color-danger-text)]",
+                t.type === "success" && "text-[var(--color-success-text)]",
               )}
             >
               <Icon size={18} className="shrink-0" />

@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/Button";
 import type { Task, University } from "@/types";
@@ -7,11 +8,13 @@ export function TaskListItem({
   university,
   onToggle,
   onEdit,
+  onDelete,
 }: {
   task: Task;
   university?: University;
   onToggle: () => void;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   return (
     <li className="rounded-2xl border border-[color-mix(in_srgb,var(--glass-border)_70%,transparent)] bg-[color-mix(in_srgb,var(--glass-bg-2)_70%,transparent)] p-3 shadow-[0_10px_24px_rgba(0,0,0,0.08)]">
@@ -30,6 +33,9 @@ export function TaskListItem({
           </Button>
           <Button size="sm" onClick={onEdit}>
             Edit
+          </Button>
+          <Button size="icon" variant="ghost" aria-label="Delete task" onClick={onDelete}>
+            <Trash2 size={16} />
           </Button>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useAutosaveField } from "@/hooks/useAutosaveField";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
-import { Input, Select, Textarea } from "@/components/ui/Field";
+import { Input, Select, Textarea, UrlField } from "@/components/ui/Field";
 import { cn } from "@/lib/cn";
 import { PIPELINE_STAGES } from "@/types";
 
@@ -26,7 +26,7 @@ function PortalAndNotes({ universityId }: { universityId: string }) {
         <label htmlFor="trackingPortal" className="text-[0.92rem] font-semibold text-[var(--muted)]">
           Portal link
         </label>
-        <Input id="trackingPortal" type="url" placeholder="https://…" value={portal} onChange={(e) => setPortal(e.target.value)} />
+        <UrlField id="trackingPortal" placeholder="https://…" value={portal} onChange={(e) => setPortal(e.target.value)} />
       </div>
       <div className="grid gap-2">
         <label htmlFor="trackingCreds" className="text-[0.92rem] font-semibold text-[var(--muted)]">
@@ -90,7 +90,7 @@ export function TrackingPage() {
               ))}
             </div>
 
-            <div className="grid gap-3.5 md:grid-cols-2">
+            <div className="grid gap-3.5 @xl:grid-cols-2">
               <div className="rounded-2xl border border-[color-mix(in_srgb,var(--glass-border)_70%,transparent)] bg-[color-mix(in_srgb,var(--glass-bg-2)_70%,transparent)] p-3.5">
                 <h3 className="font-bold">Submission checklist</h3>
                 <ul className="mt-2.5 grid list-none gap-2.5 p-0">

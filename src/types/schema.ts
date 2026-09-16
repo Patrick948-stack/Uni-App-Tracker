@@ -20,6 +20,12 @@ const checkItemSchema = z.object({
   done: z.boolean(),
 });
 
+const guidedResearchNoteSchema = z.object({
+  link: z.string(),
+  notes: z.string(),
+  done: z.boolean(),
+});
+
 const universitySchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -60,6 +66,7 @@ const universitySchema = z.object({
   submissionChecklist: z.array(checkItemSchema),
   trackingPortal: z.string(),
   trackingCreds: z.string(),
+  guidedResearch: z.record(z.string(), guidedResearchNoteSchema).optional(),
   createdAt: z.string(),
 });
 

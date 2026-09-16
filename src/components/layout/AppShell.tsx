@@ -22,9 +22,9 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar />
-      <div className="mx-auto grid w-full max-w-[1300px] flex-1 gap-4 p-4 md:grid-cols-[250px_1fr]">
+      <div className="mx-auto grid w-full max-w-[1300px] flex-1 gap-4 p-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:grid-cols-[250px_1fr] md:pb-4">
         <SideNav />
-        <main className="min-w-0" aria-live="polite">
+        <main className="@container min-w-0" aria-live="polite">
           <Suspense fallback={<PageFallback />}>
             <Outlet />
           </Suspense>
